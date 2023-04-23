@@ -3,7 +3,8 @@ import os
 import markdown
 import shutil
 
-def Mixen_van_Md_en_html(Markdown_bestand,HTML_bestand ):
+
+def Mixen_van_Md_en_html(Markdown_bestand, HTML_bestand, titel):
 
     root = "SSG Project"
     md_folder = "pages"
@@ -16,35 +17,40 @@ def Mixen_van_Md_en_html(Markdown_bestand,HTML_bestand ):
     with open(os.path.join(pages_path, md_filename), 'r') as file:
         markdown_text = file.read()
 
-
     # Converteer de Markdown naar HTML
     html = markdown.markdown(markdown_text)
 
     # Schrijf de HTML naar een nieuw bestand
     tekst = html
-    environment = Environment(loader=FileSystemLoader("SSG Project/templates/"))
+
+    #output_file = os.path.splitext(Markdown_bestand)[0] + ".html"
+    #link_inhoud = f'<a href="{output_file}">link text</a>'
+    
+
+    environment = Environment(
+        loader=FileSystemLoader("SSG Project/templates/"))
     template = environment.get_template(HTML_bestand)
     content = template.render(
-        tekst = tekst
+        tekst=tekst
     )
 
     results_filename = HTML_bestand
     results_template = environment.get_template(HTML_bestand)
     context = {
         "tekst": tekst,
-        "content": content # voeg de gerenderde markdown content toe aan de context
+        "Titel": titel,
+        "content": content  # voeg de gerenderde markdown content toe aan de context
     }
 
-
-    new_folder = os.path.join(root, '_site')
-    os.mkdir(new_folder)
     output_path = os.path.join(root, "_site")
 
-    for page_name in os.listdir(pages_path):
-        # Get file paths
-        page_path = os.path.join(md_folder, page_name)
-        output_file = os.path.splitext(page_name)[0] + ".html"
-        output_path_full = os.path.join(output_path, output_file)
 
-        with open(output_path_full, mode="w", encoding="utf-8") as results:
-            results.write(results_template.render(context))
+        # Get file paths
+    page_path = os.path.join(md_folder, Markdown_bestand)
+    output_file = os.path.splitext(Markdown_bestand)[0] + ".html"
+    output_path_full = os.path.join(output_path, output_file)
+
+    with open(output_path_full, mode="w", encoding="utf-8") as results:
+        results.write(results_template.render(context))
+
+    return output_file
